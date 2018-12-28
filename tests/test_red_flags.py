@@ -160,3 +160,69 @@ def test_delete_flag(client):
 def test_cant_delete_non_exitent_flag(client):
     response = client.delete('/api/v1/red_flags/1')
     assert json_of_response(response)['error'] == 'red flag not found'
+
+
+'''Data validation tests to return error responses'''
+
+
+# Test red_flag with missing mandatory field not created, correct error
+# message in response
+def test_incomplete_red_flag_not_created(client):
+    response = post_json(client, 'api/v1/red_flags', dat['incomplete'])
+    assert response.status_code == 400
+    assert json_of_response(response)['error'] ==\
+        'comment field missing, invalid key or incorrect'
+
+
+# Test empty mandatory fields supplied during creation flagged,
+# correct response
+def test_validat_empty_required_fields_flag_not_created(client):
+    response = post_json(client, '/api/v1/red_flags', dat['empty'])
+    assert response.status_code == 400
+    assert json_of_response(response)['error'] == 'please submit location'
+
+
+# Test wrong data_type flagged
+def test_validate_data_types(client):
+    response = post_json(client, '/api/v1/red_flags', dat['invalid'])
+    assert response.status_code == 400
+    assert json_of_response(response)['error'] ==\
+        "createdBy should be of type <class 'int'>"
+
+
+# Test correct response if new field value for edit is null
+def test_cant_change_editable_field_value_to_null(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    response = patch_json(
+            client, '/api/v1/red_flags/1/comment', {'comment': ''}
+            )
+    assert json_of_response(response)['error'] == 'submit new comment'
+
+
+# Test correct response if key for field to be edited not provided
+def test_correct_response_if_key_for_field_missing(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    response = patch_json(
+            client, '/api/v1/red_flags/1/comment', {'location': 'here'}
+            )
+    assert json_of_response(response)['error'] ==\
+        'comment key missing, check your input or url'
+
+
+# Test post or patch reqquests return correct response if no data
+# this tests the json_required wrapper/decorator and the error handler 400
+# on all routes decorated so
+def test_send_empty_request_where_data_required(client):
+    result = post_json(client, '/api/v1/red_flags', '')
+    assert result.status_code == 400
+    assert json_of_response(result)['error'] == 'empty request'
+
+
+# Test wrong endpoint flagged
+def test_wrong_endpoint(client):
+    result = patch_json(
+            client, '/api/v1/red_flags/1/something_else', {"comment": "mihjh"}
+            )
+    assert result.status_code == 400
+    assert json_of_response(result)['error'] ==\
+        'no field something_else in red flag, check your request'
