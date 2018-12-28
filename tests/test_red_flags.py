@@ -75,3 +75,21 @@ def test_get_all_fails_when_none(client):
     assert json_of_response(response) == {
             'Status': 404, 'error': 'no red flags'
             }
+
+
+# Test can fetch particular flag by id; correct response code and body
+def test_get_single_flag_by_id(client):
+    flag = post_json(client, '/api/v1/red_flags', {
+            'location': 'there', 'createdBy': 10, 'comment': 'gavi money'
+            })
+    assert json_of_response(flag)['Status'] == 201
+    resp = client.get('/api/v1/red_flags/1')
+    assert json_of_response(resp)['data'][0]['comment'] == 'gavi money'
+
+
+# Test correct response if particular flag non available
+def test_get_single_flag_by_non_existent_id_fails(client):
+    resp = client.get('/api/v1/red_flags/100')
+    assert resp.status_code == 404
+    assert 'error' in json_of_response(resp)
+    assert json_of_response(resp)['error'] == 'red flag not found'
