@@ -206,8 +206,7 @@ def test_correct_response_if_key_for_field_missing(client):
             client, '/api/v1/red_flags/1/comment', {'location': 'here'}
             )
     assert json_of_response(response)['error'] ==\
-        'comment key missing, check your input. if input correct, change\
-        endpoint to match input'
+        'comment key missing, check your input or url'
 
 
 # Test post or patch reqquests return correct response if no data

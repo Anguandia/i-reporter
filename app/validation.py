@@ -21,15 +21,13 @@ class Validation:
             if field in self.data_types and data[field]:
                 # check if input data is of correct type
                 if not isinstance(data[field], self.data_types[field]):
-                    #return [
-                    #  400, 'error',
-                    #  f'{field} should be of type {self.data_types[field]}'
-                    #  ]
-                    msg = f'{field} should be of type {self.data_types[field]}'
+                    return [
+                      400, 'error',
+                      f'{field} should be of type {self.data_types[field]}'
+                      ]
             # check forinvalid keys in data
             elif field not in self.data_types:
-                msg = f'unknown input {field}'
-        return [400, 'error', msg]
+                return [400, 'error', f'unknown input {field}']
 
     def validateNew(self, data):
         if self.bad_type(data):
@@ -38,8 +36,8 @@ class Validation:
             for field in ['location', 'comment', 'createdBy']:
                 if field not in data:
                     return [
-                      400, 'error', f'{field} field missing, invalid key\
-                      or incorrect'
+                      400, 'error',
+                      f'{field} field missing, invalid key or incorrect'
                       ]
                 if not data[field]:
                     return [400, 'error', 'please submit {}'.format(field)]
