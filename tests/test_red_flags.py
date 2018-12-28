@@ -208,3 +208,22 @@ def test_correct_response_if_key_for_field_missing(client):
     assert json_of_response(response)['error'] ==\
         'comment key missing, check your input. if input correct, change\
         endpoint to match input'
+
+
+# Test post or patch reqquests return correct response if no data
+# this tests the json_required wrapper/decorator and the error handler 400
+# on all routes decorated so
+def test_send_empty_request_where_data_required(client):
+    result = post_json(client, '/api/v1/red_flags', '')
+    assert result.status_code == 400
+    assert json_of_response(result)['error'] == 'empty request'
+
+
+# Test wrong endpoint flagged
+def test_wrong_endpoint(client):
+    result = patch_json(
+            client, '/api/v1/red_flags/1/something_else', {"comment": "mihjh"}
+            )
+    assert result.status_code == 400
+    assert json_of_response(result)['error'] ==\
+        'no field something_else in red flag, check your request'
