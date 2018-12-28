@@ -138,3 +138,9 @@ def test_add_goeloc(client):
     # ascertain that geoloc updated to latest value
     assert 'N: 0.000, E: 0.000' in json_of_response(resp1)['data'][0][
             'location']
+
+
+# Test correct response if flag to be edited does not exist
+def test_correct_response_if_flag_tobe_edited_not_exist(client):
+    response = patch_json(client, '/api/v1/red_flags/1/comment', {'comment': 'any'})
+    assert json_of_response(response)['error'] == 'red flag not found'
