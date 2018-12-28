@@ -1,6 +1,8 @@
 import os
 from flask import request, jsonify
 from .implementation import Implementation
+from app.validation import Validation
+from app.wrappers import json_required
 from app import create_app
 
 
@@ -19,9 +21,10 @@ def home():
 
 
 @app.route('/api/v1/red_flags', methods=['POST'])
+@json_required
 def create_flag():
     data = request.json
-    res = Implementation().create(data)
+    res = Validation().validateNew(data)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
@@ -38,9 +41,10 @@ def get_flag(red_flag_id):
 
 
 @app.route('/api/v1/red_flags/<red_flag_id>/<key>', methods=['PATCH'])
+@json_required
 def edit(red_flag_id, key):
     data = request.json
-    res = Implementation().edit(red_flag_id, data, key)
+    res = Validation().validateEdit(data, red_flag_id, key)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
