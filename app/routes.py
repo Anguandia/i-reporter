@@ -31,11 +31,7 @@ def get_flags():
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
-def get_flag(self, red_flag_id):
-        try:
-            red_flag = red_flags[str(red_flag_id)]
-            res = [200, 'data', [red_flag]]
-        except Exception as e:
-            print(e)
-            res = [404, 'error', 'red flag not found']
-        return res
+@app.route('/api/v1/red_flags/<red_flag_id>', methods=['GET'])
+def get_flag(red_flag_id):
+    res = Implementation().get_flag(red_flag_id)
+    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
