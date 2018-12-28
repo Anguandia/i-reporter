@@ -4,6 +4,9 @@ from .implementation import Implementation
 from app import create_app
 
 
+red_flags = {}
+
+
 config_name = os.getenv('FLASK_ENV')
 app = create_app(config_name)
 
@@ -26,3 +29,13 @@ def create_flag():
 def get_flags():
     res = Implementation().get_flags()
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
+
+
+def get_flag(self, red_flag_id):
+        try:
+            red_flag = red_flags[str(red_flag_id)]
+            res = [200, 'data', [red_flag]]
+        except Exception as e:
+            print(e)
+            res = [404, 'error', 'red flag not found']
+        return res
