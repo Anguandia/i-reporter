@@ -142,7 +142,9 @@ def test_add_goeloc(client):
 
 # Test correct response if flag to be edited does not exist
 def test_correct_response_if_flag_tobe_edited_not_exist(client):
-    response = patch_json(client, '/api/v1/red_flags/1/comment', {'comment': 'any'})
+    response = patch_json(
+            client, '/api/v1/red_flags/1/comment', {'comment': 'any'}
+            )
     assert json_of_response(response)['error'] == 'red flag not found'
 
 
@@ -150,10 +152,59 @@ def test_correct_response_if_flag_tobe_edited_not_exist(client):
 def test_delete_flag(client):
     post_json(client, '/api/v1/red_flags', dat['basic'])
     response = client.delete('/api/v1/red_flags/1')
-    assert json_of_response(response)['data'][0]['message'] == 'red-flag record has been deleted'
+    assert json_of_response(response)['data'][0]['message'] ==\
+        'red-flag record has been deleted'
 
 
 # Test correct response if flag selected for deletion does not exist
 def test_cant_delete_non_exitent_flag(client):
     response = client.delete('/api/v1/red_flags/1')
     assert json_of_response(response)['error'] == 'red flag not found'
+
+
+'''Data validation tests to return error responses'''
+
+
+# Test red_flag with missing mandatory field not created, correct error
+# message in response
+def test_incomplete_red_flag_not_created(client):
+    response = post_json(client, 'api/v1/red_flags', dat['incomplete'])
+    assert response.status_code == 400
+    assert json_of_response(response)['error'] ==\
+        'comment field missing, invalid key or incorrect'
+
+
+# Test empty mandatory fields supplied during creation flagged,
+# correct response
+def test_validat_empty_required_fields_flag_not_created(client):
+    response = post_json(client, '/api/v1/red_flags', dat['empty'])
+    assert response.status_code == 400
+    assert json_of_response(response)['error'] == 'please submit location'
+
+
+# Test wrong data_type flagged
+def test_validate_data_types(client):
+    response = post_json(client, '/api/v1/red_flags', dat['invalid'])
+    assert response.status_code == 400
+    assert json_of_response(response)['error'] ==\
+        "createdBy should be of type <class 'int'>"
+
+
+# Test correct response if new field value for edit is null
+def test_cant_change_editable_field_value_to_null(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    response = patch_json(
+            client, '/api/v1/red_flags/1/comment', {'comment': ''}
+            )
+    assert json_of_response(response)['error'] == 'submit new comment'
+
+
+# Test correct response if key for field to be edited not provided
+def test_correct_response_if_key_for_field_missing(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    response = patch_json(
+            client, '/api/v1/red_flags/1/comment', {'location': 'here'}
+            )
+    assert json_of_response(response)['error'] ==\
+        'comment key missing, check your input. if input correct, change\
+        endpoint to match input'
