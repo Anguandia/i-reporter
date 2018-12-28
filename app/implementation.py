@@ -67,3 +67,11 @@ class Implementation:
         except Exception:
             result = self.get_flag(red_flag_id)
         return result
+
+    def delete(self, red_flag_id):
+        try:
+            red_flags.pop(str(red_flag_id))
+            res = [200, 'data', [{'id': red_flag_id, 'message': 'red-flag record has been deleted'}]]
+        except Exception:
+            res = [404, 'error', 'red flag not found']
+        return res
