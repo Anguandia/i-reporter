@@ -12,6 +12,6 @@ app = create_app('TESTING')
 
 @app.route('/')
 @app.route('/api/v1')
-@app.route('/api/v1')
+@app.route('/api/v1/')
 def home():
     return jsonify({'home': 'welcome to iReporter, please make a request'})
