@@ -6,7 +6,9 @@ red_flags = {}
 
 class Implementation:
     def create(self, data):
-        others = {'type': 'red-flag', 'status': 'draft'}
+        others = {
+            'type': 'red-flag', 'status': 'draft', 'videos': '', 'images': ''
+            }
         red_flag = RedFlag(
             (len(red_flags)+1), data['location'], data['createdBy'],
             data['comment']
