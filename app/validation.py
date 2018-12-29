@@ -18,13 +18,12 @@ class Validation:
 
     def bad_type(self, data):
         for field in data:
-            if field in self.data_types and data[field]:
-                # check if input data is of correct type
-                if not isinstance(data[field], self.data_types[field]):
-                    return [
-                      400, 'error',
-                      f'{field} should be of type {self.data_types[field]}'
-                      ]
+            if field in self.data_types and not isinstance(
+                    data[field], self.data_types[field]):
+                return [
+                    400, 'error',
+                    f'{field} should be of type {self.data_types[field]}'
+                    ]
             # check forinvalid keys in data
             elif field not in self.data_types:
                 return [400, 'error', f'unknown input {field}']
