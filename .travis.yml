@@ -9,8 +9,8 @@ before script:
   env: FLASK_ENV='TESTING'
 script:
   - python -m pytest --cov
-after success:
-  - "coveralls"
+after_success:
+  - coveralls
 notifications:
   email:
     recipients:
