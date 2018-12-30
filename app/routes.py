@@ -20,6 +20,35 @@ def home():
     return jsonify({'home': 'welcome to iReporter, please make a request'})
 
 
+@app.route('/api/v1/<resource>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@app.route(
+  '/api/v1/<resource>/<id>', methods=['GET', 'POST', 'PATCH', 'DELETE']
+  )
+@app.route(
+  '/api/v1/<resource>/<id>/<action>',
+  methods=['GET', 'POST', 'PATCH', 'DELETE']
+  )
+def wrongEndpoint(resource, id=None, action=None):
+    if resource != 'red_flags':
+        resp = [400, f'wrong url, error in spelling of \'{resource}\'']
+    elif id and not action:
+        if request.method == 'POST':
+            resp = [
+              405, f'red-flag id\'s are generated automatically,\
+              remove \'{id}\'']
+        elif request.method == 'PATCH':
+            resp = [405, 'wrong method or specify field to edit in url']
+    elif id and action:
+        if action not in ['location', 'status', 'comment']:
+            resp = [400, f'wrong endpoint, verify \'{action}\'']
+        elif request.method != 'PATCH':
+            resp = [405, f'wrong method, tis url is for editing {action}']
+    else:
+        if request.method not in ['POST', 'GET']:
+            resp = [405, 'wrong method']
+    return jsonify({'Status': resp[0], 'error': resp[1]}), resp[0]
+
+
 @app.route('/api/v1/red_flags', methods=['POST'])
 @json_required
 def create_flag():
@@ -36,7 +65,9 @@ def get_flags():
 
 @app.route('/api/v1/red_flags/<red_flag_id>', methods=['GET', 'DELETE'])
 def single_flag(red_flag_id):
-    if request.method == 'GET':
+    if Validation.validateId(red_flag_id):
+        res = [400, 'error', Validation.validateId(red_flag_id)]
+    elif request.method == 'GET':
         res = Implementation().get_flag(red_flag_id)
     else:
         res = Implementation().delete(red_flag_id)
