@@ -17,7 +17,15 @@ app = create_app('TESTING')
 @app.route('/api/v1')
 @app.route('/api/v1/')
 def home():
-    return jsonify({'home': 'welcome to iReporter, please make a request'})
+    return jsonify({
+      'instructions':
+      'https://agile-basin-53232.herokuapp.com/',
+      'create or get all flags':
+      'https://agile-basin-53232.herokuapp.com/red_flags',
+      'get or delete single flag':
+      'https://agile-basin-53232.herokuapp.com/red_flags/id',
+      'edit flag': 'https://agile-basin-53232.herokuapp.com/red_flags/id/field'
+      })
 
 
 @app.route('/api/v1/<resource>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
@@ -46,7 +54,10 @@ def wrongEndpoint(resource, id=None, action=None):
     else:
         if request.method not in ['POST', 'GET']:
             resp = [405, 'wrong method']
-    return jsonify({'Status': resp[0], 'error': resp[1]}), resp[0]
+    return jsonify({
+      'Status': resp[0], 'error': resp[1] +
+      '. check https://agile-basin-53232.herokuapp.com/ for instructions'}),\
+        resp[0]
 
 
 @app.route('/api/v1/red_flags', methods=['POST'])
