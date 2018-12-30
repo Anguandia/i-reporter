@@ -62,7 +62,7 @@ class Implementation:
                 red_flag[field] = data[field]
                 res = 'updated'
             result = [200, 'data', [{
-                    'id': red_flag_id, 'message':
+                    'id': int(red_flag_id), 'message':
                     f'{res} red-flag record\'s {field}'}]]
         except Exception:
             result = self.get_flag(red_flag_id)
@@ -71,7 +71,7 @@ class Implementation:
     def delete(self, red_flag_id):
         try:
             red_flags.pop(str(red_flag_id))
-            res = [200, 'data', [{'id': red_flag_id, 'message':
+            res = [200, 'data', [{'id': int(red_flag_id), 'message':
                                  'red-flag record has been deleted'}]]
         except Exception:
             res = [404, 'error', 'red flag not found']
