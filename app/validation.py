@@ -65,3 +65,11 @@ class Validation:
         else:
             result = Implementation().edit(red_flag_id, data, field)
         return result
+
+    '''validation for id in url'''
+    @staticmethod
+    def validateId(id):
+        try:
+            int(id)
+        except Exception:
+            return 'id must be a number'
