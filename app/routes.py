@@ -42,8 +42,7 @@ def wrongEndpoint(resource, id=None, action=None):
     elif id and not action:
         if request.method == 'POST':
             resp = [
-              405, f'red-flag id\'s are generated automatically,\
-              remove \'{id}\'']
+              405, f'wrong method or url, remove \'{id}\' or change method']
         elif request.method == 'PATCH':
             resp = [405, 'wrong method or specify field to edit in url']
     elif id and action:
