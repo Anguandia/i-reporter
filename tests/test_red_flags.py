@@ -56,3 +56,22 @@ def test_optional_flag_properties_set_in_creation(client):
     post_json(client, '/api/v1/red_flags', dat['optional'])
     response = client.get('/api/v1/red_flags/1')
     assert json_of_response(response)['data'][0]['type'] == 'intervention flag'
+
+
+# Test can retrieve all red_flags; correct response code and body
+def test_get_flags(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    response = client.get('/api/v1/red_flags')
+    assert len(json_of_response(response)['data']) == 4
+
+
+# Test correct response to get all request if none; code and body
+def test_get_all_fails_when_none(client):
+    response = client.get('/api/v1/red_flags')
+    assert response.status_code == 404
+    assert json_of_response(response) == {
+            'Status': 404, 'error': 'no red flags'
+            }
