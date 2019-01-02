@@ -64,7 +64,7 @@ class Implementation:
                         'geolocation ' + f'N: {d[0]}, E: {d[1]}'
                     res = 'updated'
             # make a general provision for future editable fields
-            elif ' ' not in data['location']:
+            elif field == 'location' and ' ' not in data['location']:
                 res = [
                     400, 'error',
                     "location must be of format'latitude <space> longitude'"
