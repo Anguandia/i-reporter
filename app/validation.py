@@ -50,9 +50,9 @@ class Validation:
               400, 'error', f'no field {field} in red flag, check your request'
               ]
         # check if editing is authorizes for field
-        elif field not in ['location', 'comment']:
+        elif field not in ['location', 'comment', 'status']:
             result = [403, 'error', f'{field} can not be changed']
-        # check error in data jey vs endpoint specification
+        # check error in data key vs endpoint specification
         elif field not in data:
             result = [
               403, 'error',
