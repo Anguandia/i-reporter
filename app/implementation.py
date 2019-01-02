@@ -72,12 +72,8 @@ class Implementation:
             else:
                 red_flag[field] = data[field]
                 res = 'updated'
-<<<<<<< HEAD
-            result = [200, 'data', [{
-=======
             if isinstance(res, str):
                 result = [200, 'data', [{
->>>>>>> 162840685-ft-edit
                     'id': int(red_flag_id), 'message':
                     f'{res} red-flag record\'s {field}'}]]
             else:
