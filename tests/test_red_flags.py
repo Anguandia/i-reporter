@@ -142,5 +142,21 @@ def test_add_goeloc(client):
 
 # Test correct response if flag to be edited does not exist
 def test_correct_response_if_flag_tobe_edited_not_exist(client):
-    response = patch_json(client, '/api/v1/red_flags/1/comment', {'comment': 'any'})
+    response = patch_json(
+            client, '/api/v1/red_flags/1/comment', {'comment': 'any'}
+            )
+    assert json_of_response(response)['error'] == 'red flag not found'
+
+
+# Test can delete given flag
+def test_delete_flag(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    response = client.delete('/api/v1/red_flags/1')
+    assert json_of_response(response)['data'][0]['message'] ==\
+        'red-flag record has been deleted'
+
+
+# Test correct response if flag selected for deletion does not exist
+def test_cant_delete_non_exitent_flag(client):
+    response = client.delete('/api/v1/red_flags/1')
     assert json_of_response(response)['error'] == 'red flag not found'
