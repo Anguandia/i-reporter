@@ -1,4 +1,5 @@
 # i-reporter
+
 [![Build Status](https://travis-ci.com/Anguandia/iReporter_app.svg?branch=develop)](https://travis-ci.com/Anguandia/iReporter_app)
 [![Coverage Status](https://coveralls.io/repos/github/Anguandia/i-reporter/badge.svg?branch=develop)](https://coveralls.io/github/Anguandia/i-reporter?branch=develop)
 
@@ -96,3 +97,4 @@ Cloud hosting: https://agile-basin-53232.herokuapp.com/
 Pivotal tracker: https://www.pivotaltracker.com/n/projects/2232384 Contains the project plan, implementation and management details
 Documentation: https://app.swaggerhub.com/apis/Anguandia/iReporter/1# Technical documentation of application detailing usage, parameters, expected behavior, requests and responses, etc 
 Licencing: GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+
