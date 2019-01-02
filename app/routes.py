@@ -4,6 +4,9 @@ from .implementation import Implementation
 from app import create_app
 
 
+red_flags = {}
+
+
 config_name = os.getenv('FLASK_ENV')
 app = create_app(config_name)
 
@@ -25,4 +28,10 @@ def create_flag():
 @app.route('/api/v1/red_flags', methods=['GET'])
 def get_flags():
     res = Implementation().get_flags()
+    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
+
+
+@app.route('/api/v1/red_flags/<red_flag_id>', methods=['GET'])
+def get_flag(red_flag_id):
+    res = Implementation().get_flag(red_flag_id)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
