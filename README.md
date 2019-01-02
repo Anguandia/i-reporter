@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.com/Anguandia/iReporter_app.svg?branch=develop)](https://travis-ci.com/Anguandia/iReporter_app)
 [![Coverage Status](https://coveralls.io/repos/github/Anguandia/i-reporter/badge.svg?branch=develop)](https://coveralls.io/github/Anguandia/i-reporter?branch=develop)
+<a href="https://codeclimate.com/github/Anguandia/i-reporter/test_coverage"><img src="https://api.codeclimate.com/v1/badges/bc3efe893a1a0d26b2aa/test_coverage" /></a>
 
 **INTRODUCTION**
 
