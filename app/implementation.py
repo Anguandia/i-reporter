@@ -47,7 +47,7 @@ class Implementation:
                 return [
                     403, 'error', f'red flag already {red_flag["status"]}'
                     ]
-            elif field == 'location':
+            elif field == 'location' and ' ' in data['location']:
                 d = data['location'].split(' ')
                 # case first case geolocation being added, tag record as
                 # 'location added' with geolocation prepend and append geoloc
@@ -64,12 +64,24 @@ class Implementation:
                         'geolocation ' + f'N: {d[0]}, E: {d[1]}'
                     res = 'updated'
             # make a general provision for future editable fields
+            elif ' ' not in data['location']:
+                res = [
+                    400, 'error',
+                    "location must be of format'latitude <space> longitude'"
+                    ]
             else:
                 red_flag[field] = data[field]
                 res = 'updated'
+<<<<<<< HEAD
             result = [200, 'data', [{
+=======
+            if isinstance(res, str):
+                result = [200, 'data', [{
+>>>>>>> 162840685-ft-edit
                     'id': int(red_flag_id), 'message':
                     f'{res} red-flag record\'s {field}'}]]
+            else:
+                result = res
         except Exception:
             result = self.get_flag(red_flag_id)
         return result
