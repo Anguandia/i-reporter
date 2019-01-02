@@ -55,7 +55,7 @@ class Validation:
         # check error in data jey vs endpoint specification
         elif field not in data:
             result = [
-              403, 'error',
+              400, 'error',
               f'{field} key missing, check your input or url'
               ]
         # safeguard against accidental deleting of field data
