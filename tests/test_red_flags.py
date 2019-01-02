@@ -102,7 +102,7 @@ def test_get_single_flag_by_non_existent_id_fails(client):
     assert json_of_response(resp)['error'] == 'red flag not found'
 
 
-# Test can edit location and comment
+# Test can edit comment
 def test_can_edit_comment(client):
     post_json(client, '/api/v1/red_flags', dat['basic'])
     response = patch_json(client, '/api/v1/red_flags/1/comment', {
@@ -226,3 +226,43 @@ def test_wrong_endpoint(client):
     assert result.status_code == 400
     assert json_of_response(result)['error'] ==\
         'no field something_else in red flag, check your request'
+
+
+# Test wrong method for valid endpoint flagged
+def test_wrong_method(client):
+    res = patch_json(client, '/api/v1/red_flags/1', dat['basic'])
+    assert res.status_code == 405
+    assert 'wrong method' in json_of_response(res)['error']
+
+
+def test_geolocation_format_checked(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    res = patch_json(
+            client, '/api/v1/red_flags/1/location', {
+                    "location": "03.5623,31.5652"}
+                    )
+    assert res.status_code == 400
+    assert 'location must be of format' in json_of_response(res)['error']
+
+
+# Test wrong base url flagged
+def test_wrong_base_url(client):
+    res = client.get('/api/v1/wrongbase/1')
+    assert 'wrong url' in json_of_response(res)['error']
+
+
+# test patch request without end point flagged
+def test_no_end_point_for_patch(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    res = patch_json(client, '/api/v1/red_flags/1', {'comment': 'any'})
+    assert 'specify field' in json_of_response(res)['error']
+
+
+# Test can add geolocation to existin descriptive location
+def test_can_add_geolocation_if_not_added(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    patch_json(
+            client, '/api/v1/red_flags/1/location', {'location': '03 31'}
+            )
+    res = client.get('/api/v1/red_flags/1')
+    assert 'N: 03, E: 31' in json_of_response(res)['data'][0]['location']
