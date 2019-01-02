@@ -1,5 +1,6 @@
 from .models import RedFlag
 import datetime
+import re
 
 red_flags = {}
 
@@ -65,6 +66,7 @@ class Implementation:
                     res = 'updated'
             # make a general provision for future editable fields
             elif field == 'location' and ' ' not in data['location']:
+
                 res = [
                     400, 'error',
                     "location must be of format'latitude <space> longitude'"
