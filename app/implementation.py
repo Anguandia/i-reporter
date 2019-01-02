@@ -6,13 +6,19 @@ red_flags = {}
 
 class Implementation:
     def create(self, data):
+        others = {
+            'type': 'red-flag', 'status': 'draft', 'videos': '', 'images': ''
+            }
         red_flag = RedFlag(
             (len(red_flags)+1), data['location'], data['createdBy'],
             data['comment']
             )
-        for field in data:
-            if field not in ['location', 'createdBy', 'comment']:
-                red_flag.__setattr__(field, data[field])
+        red_flag.__setattr__('createdOn', datetime.datetime.now())
+        for key in others:
+            if key in data:
+                red_flag.__setattr__(key, data[key])
+            else:
+                red_flag.__setattr__(key, others[key])
         red_flags[str(red_flag.id)] = red_flag.__dict__
         return [
             201, 'data', [{'id': red_flag.id, 'message': 'Created red flag'}]
@@ -41,7 +47,7 @@ class Implementation:
                 return [
                     403, 'error', f'red flag already {red_flag["status"]}'
                     ]
-            elif field == 'location':
+            elif field == 'location' and ' ' in data['location']:
                 d = data['location'].split(' ')
                 # case first case geolocation being added, tag record as
                 # 'location added' with geolocation prepend and append geoloc
@@ -58,12 +64,29 @@ class Implementation:
                         'geolocation ' + f'N: {d[0]}, E: {d[1]}'
                     res = 'updated'
             # make a general provision for future editable fields
+            elif ' ' not in data['location']:
+                res = [
+                    400, 'error',
+                    "location must be of format'latitude <space> longitude'"
+                    ]
             else:
                 red_flag[field] = data[field]
                 res = 'updated'
-            result = [200, 'data', [{
-                    'id': red_flag_id, 'message':
+            if isinstance(res, str):
+                result = [200, 'data', [{
+                    'id': int(red_flag_id), 'message':
                     f'{res} red-flag record\'s {field}'}]]
+            else:
+                result = res
         except Exception:
             result = self.get_flag(red_flag_id)
         return result
+
+    def delete(self, red_flag_id):
+        try:
+            red_flags.pop(str(red_flag_id))
+            res = [200, 'data', [{'id': int(red_flag_id), 'message':
+                                 'red-flag record has been deleted'}]]
+        except Exception:
+            res = [404, 'error', 'red flag not found']
+        return res
