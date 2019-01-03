@@ -255,30 +255,37 @@ def test_wrong_base_url(client):
 def test_no_end_point_for_patch(client):
     post_json(client, '/api/v1/red_flags', dat['basic'])
     res = patch_json(client, '/api/v1/red_flags/1', {'comment': 'any'})
-    assert 'specify field' in json_of_response(res)['error']
+    assert json_of_response(res)['error'] == 'wrong method'
 
 
 # Test wrong method(post) for specific red flag flaged
 def test_wrong_method_post(client):
     res = post_json(client, '/api/v1/red_flags/1', dat['basic'])
     assert res.status_code == 405
-    assert 'wrong method or url' in json_of_response(res)['error']
-
-
-# Test correct response for wrong method for edit endpoints
-def test_wrong_method_for_edit(client):
-    post_json(client, '/api/v1/red_flags', dat['basic'])
-    res = client.get('/api/v1/red_flags/1/comment')
-    assert 'wrong method, ' in json_of_response(res)['error']
+    assert json_of_response(res)['error'] == 'wrong method'
 
 
 # test wrong method for post/get all routes flagged
 def test_wrong_method_for_post_and_get(client):
     res = client.delete('/api/v1/red_flags')
-    assert 'wrong method' in json_of_response(res)['error']
+    assert json_of_response(res)['error'] == 'wrong method'
 
 
 # test id type validation
 def test_validate_id_type(client):
     res = client.get('/api/v1/red_flags/one')
     assert json_of_response(res)['error'] == 'id must be a number'
+
+
+# Test default route
+def test_default_route(client):
+    res = client.get('/')
+    assert 'edit flag' in json_of_response(res)
+
+
+# Test correct response if wrong method for patch route
+def test_correct_response_wrong_method_for_update(client):
+    response = post_json(
+            client, '/api/v1/red_flags/1/comment', {'comment': 'any'}
+            )
+    assert json_of_response(response)['error'] == 'wrong method'

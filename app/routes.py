@@ -6,9 +6,6 @@ from app.wrappers import json_required
 from app import create_app
 
 
-red_flags = {}
-
-
 config_name = os.getenv('FLASK_ENV')
 app = create_app('TESTING')
 
@@ -18,13 +15,11 @@ app = create_app('TESTING')
 @app.route('/api/v1/')
 def home():
     return jsonify({
-      'instructions':
-      'https://agile-basin-53232.herokuapp.com/',
       'create or get all flags':
-      'https://agile-basin-53232.herokuapp.com/red_flags',
+      '/red_flags',
       'get or delete single flag':
-      'https://agile-basin-53232.herokuapp.com/red_flags/id',
-      'edit flag': 'https://agile-basin-53232.herokuapp.com/red_flags/id/field'
+      '/red_flags/id',
+      'edit flag': '/red_flags/id/field'
       })
 
 
@@ -36,57 +31,54 @@ def home():
   '/api/v1/<resource>/<id>/<action>',
   methods=['GET', 'POST', 'PATCH', 'DELETE']
   )
-def wrongEndpoint(resource, id=None, action=None):
+def wrongURL(resource, id=None, action=None):
     if resource != 'red_flags':
-        resp = [400, f'wrong url, error in spelling of \'{resource}\'']
-    elif id and not action:
-        if request.method == 'POST':
-            resp = [
-              405, f'wrong method or url, remove \'{id}\' or change method']
-        elif request.method == 'PATCH':
-            resp = [405, 'wrong method or specify field to edit in url']
-    elif id and action:
-        if action not in ['location', 'status', 'comment']:
-            resp = [400, f'wrong endpoint, verify \'{action}\'']
-        elif request.method != 'PATCH':
-            resp = [405, f'wrong method, tis url is for editing {action}']
-    else:
-        if request.method not in ['POST', 'GET']:
-            resp = [405, 'wrong method']
-    return jsonify({
-      'Status': resp[0], 'error': resp[1] +
-      '. check https://agile-basin-53232.herokuapp.com/ for instructions'}),\
-        resp[0]
+        return jsonify(
+            {'Status': 400, 'error': f'wrong url, check \'{resource}\''}
+            ), 400
 
 
 @app.route('/api/v1/red_flags', methods=['POST'])
 @json_required
 def create_flag():
-    data = request.json
-    res = Validation().validateNew(data)
+    if request.method != 'POST':
+        res = [405, 'error', 'wrong method']
+    else:
+        data = request.json
+        res = Validation().validateNew(data)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
-@app.route('/api/v1/red_flags', methods=['GET'])
+@app.route('/api/v1/red_flags', methods=['get', 'post', 'patch', 'delete'])
 def get_flags():
-    res = Implementation().get_flags()
+    if request.method != 'GET':
+        res = [405, 'error', 'wrong method']
+    else:
+        res = Implementation().get_flags()
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
-@app.route('/api/v1/red_flags/<red_flag_id>', methods=['GET', 'DELETE'])
+@app.route('/api/v1/red_flags/<red_flag_id>', methods=[
+    'get', 'delete', 'post', 'patch'])
 def single_flag(red_flag_id):
     if Validation.validateId(red_flag_id):
         res = [400, 'error', Validation.validateId(red_flag_id)]
     elif request.method == 'GET':
         res = Implementation().get_flag(red_flag_id)
-    else:
+    elif request.method == 'DELETE':
         res = Implementation().delete(red_flag_id)
+    else:
+        res = [405, 'error', 'wrong method']
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
-@app.route('/api/v1/red_flags/<red_flag_id>/<key>', methods=['PATCH'])
+@app.route('/api/v1/red_flags/<red_flag_id>/<key>', methods=[
+    'patch', 'get', 'delete', 'post'])
 @json_required
 def edit(red_flag_id, key):
-    data = request.json
-    res = Validation().validateEdit(data, red_flag_id, key)
+    if request.method != 'PATCH':
+        res = [405, 'error', 'wrong method']
+    else:
+        data = request.json
+        res = Validation().validateEdit(data, red_flag_id, key)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
