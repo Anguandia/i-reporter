@@ -1,7 +1,7 @@
 # i-reporter
 
 [![Build Status](https://travis-ci.com/Anguandia/iReporter_app.svg?branch=develop)](https://travis-ci.com/Anguandia/iReporter_app)
-[![Coverage Status](https://coveralls.io/repos/github/Anguandia/i-reporter/badge.svg)](https://coveralls.io/github/Anguandia/i-reporter)
+[![Coverage Status](https://coveralls.io/repos/github/Anguandia/i-reporter/badge.svg?branch=develop)](https://coveralls.io/github/Anguandia/i-reporter?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/bc3efe893a1a0d26b2aa/maintainability)](https://codeclimate.com/github/Anguandia/i-reporter/maintainability)
 
 **INTRODUCTION**
