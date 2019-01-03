@@ -265,7 +265,7 @@ def test_wrong_method_post(client):
     assert 'wrong method or url' in json_of_response(res)['error']
 
 
-# Test correct response for wrong method for edit endpoint
+# Test correct response for wrong method for edit endpoints
 def test_wrong_method_for_edit(client):
     post_json(client, '/api/v1/red_flags', dat['basic'])
     res = client.get('/api/v1/red_flags/1/comment')
