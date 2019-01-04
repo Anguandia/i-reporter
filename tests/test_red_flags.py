@@ -182,7 +182,7 @@ def test_validat_empty_required_fields_flag_not_created(client):
     assert json_of_response(response)['error'] == 'please submit location'
 
 
-# Test wrong data_type flagged
+# Test wrong data_type flagged in creation
 def test_validate_data_types(client):
     response = post_json(client, '/api/v1/red_flags', dat['invalid'])
     assert response.status_code == 400
@@ -225,7 +225,7 @@ def test_wrong_endpoint(client):
             )
     assert result.status_code == 400
     assert json_of_response(result)['error'] ==\
-        'no field something_else in red flag, check your request'
+        "wrong endpoint 'something_else'"
 
 
 # Test wrong method for valid endpoint flagged

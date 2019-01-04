@@ -25,8 +25,8 @@ class Validation:
                     f'{field} should be of type {self.data_types[field]}'
                     ]
             # check forinvalid keys in data
-            elif field not in self.data_types:
-                return [400, 'error', f'unknown input {field}']
+            # elif field not in self.data_types:
+            #    return [400, 'error', f'unknown input {field}']
 
     def validateNew(self, data):
         for field in ['location', 'comment', 'createdBy']:
@@ -44,14 +44,8 @@ class Validation:
         return result
 
     def validateEdit(self, data, red_flag_id, field):
-        # Check if end point is valid
-        if field not in self.data_types:
-            result = [
-              400, 'error', f'no field {field} in red flag, check your request'
-              ]
-        # check if editing is authorizes for field
-        elif field not in ['location', 'comment', 'status']:
-            result = [403, 'error', f'{field} can not be changed']
+        if field not in ['location', 'comment', 'status']:
+            result = [400, 'error', f'wrong endpoint \'{field}\'']
         # check error in data key vs endpoint specification
         elif field not in data:
             result = [

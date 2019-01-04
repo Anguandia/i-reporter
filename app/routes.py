@@ -31,35 +31,31 @@ def home():
   '/api/v1/<resource>/<id>/<action>',
   methods=['GET', 'POST', 'PATCH', 'DELETE']
   )
-def wrongURL(resource, id=None, action=None):
+def wrongURL(resource, methods=['get'], id=None, action=None):
     if resource != 'red_flags':
         return jsonify(
             {'Status': 400, 'error': f'wrong url, check \'{resource}\''}
             ), 400
+    elif request.method not in methods:
+        return jsonify({'Status': 405, 'error': 'wrong method'}), 405
 
 
 @app.route('/api/v1/red_flags', methods=['POST'])
 @json_required
 def create_flag():
-    if request.method != 'POST':
-        res = [405, 'error', 'wrong method']
-    else:
-        data = request.json
-        res = Validation().validateNew(data)
+    data = request.json
+    res = Validation().validateNew(data)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
-@app.route('/api/v1/red_flags', methods=['get', 'post', 'patch', 'delete'])
+@app.route('/api/v1/red_flags', methods=['get'])
 def get_flags():
-    if request.method != 'GET':
-        res = [405, 'error', 'wrong method']
-    else:
-        res = Implementation().get_flags()
+    res = Implementation().get_flags()
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
 @app.route('/api/v1/red_flags/<red_flag_id>', methods=[
-    'get', 'delete', 'post', 'patch'])
+    'get', 'delete'])
 def single_flag(red_flag_id):
     if Validation.validateId(red_flag_id):
         res = [400, 'error', Validation.validateId(red_flag_id)]
@@ -67,18 +63,13 @@ def single_flag(red_flag_id):
         res = Implementation().get_flag(red_flag_id)
     elif request.method == 'DELETE':
         res = Implementation().delete(red_flag_id)
-    else:
-        res = [405, 'error', 'wrong method']
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
 @app.route('/api/v1/red_flags/<red_flag_id>/<key>', methods=[
-    'patch', 'get', 'delete', 'post'])
+    'patch'])
 @json_required
 def edit(red_flag_id, key):
-    if request.method != 'PATCH':
-        res = [405, 'error', 'wrong method']
-    else:
-        data = request.json
-        res = Validation().validateEdit(data, red_flag_id, key)
+    data = request.json
+    res = Validation().validateEdit(data, red_flag_id, key)
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
