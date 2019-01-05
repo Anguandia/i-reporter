@@ -87,7 +87,8 @@ def test_get_all_when_none(client):
 # Test can fetch particular flag by id; correct response code and body
 def test_get_single_flag_by_id(client):
     flag = post_json(client, '/api/v1/red_flags', {
-            'location': 'there', 'createdBy': 10, 'comment': 'gavi money'
+            'location': 'there', 'createdBy': 10, 'comment': 'gavi money',
+            'title': 'gavi'
             })
     assert json_of_response(flag)['Status'] == 201
     resp = client.get('/api/v1/red_flags/1')
