@@ -45,8 +45,9 @@ def test_red_flag_creation(client):
 
 # Test correct generation of flag id
 def test_generate_unique_and_sequential_flag_ids(client):
-    # create a 100 flags
-    [post_json(client, 'api/v1/red_flags', dat['basic']) for i in range(100)]
+    # create 3 unique flags
+    [post_json(client, 'api/v1/red_flags', dat[key]) for key in [
+            'basic', 'optional', 'resolved']]
     response = client.get('/api/v1/red_flags')
     # extract the flags list from the getall response
     message = json_of_response(response)['data']
@@ -55,7 +56,7 @@ def test_generate_unique_and_sequential_flag_ids(client):
     # check that ids are unique
     assert len(set(ids)) == len(ids)
     # check that ids are sequential(auto-increamenting)
-    assert ids == list(range(1, 101))
+    assert ids == list(range(1, 4))
 
 
 # Test optional fields set during creation if supplied
@@ -68,19 +69,18 @@ def test_optional_flag_properties_set_in_creation(client):
 # Test can retrieve all red_flags; correct response code and body
 def test_get_flags(client):
     post_json(client, '/api/v1/red_flags', dat['basic'])
-    post_json(client, '/api/v1/red_flags', dat['basic'])
-    post_json(client, '/api/v1/red_flags', dat['basic'])
-    post_json(client, '/api/v1/red_flags', dat['basic'])
+    post_json(client, '/api/v1/red_flags', dat['optional'])
+    post_json(client, '/api/v1/red_flags', dat['resolved'])
     response = client.get('/api/v1/red_flags')
-    assert len(json_of_response(response)['data']) == 4
+    assert len(json_of_response(response)['data']) == 3
 
 
 # Test correct response to get all request if none; code and body
-def test_get_all_fails_when_none(client):
+def test_get_all_when_none(client):
     response = client.get('/api/v1/red_flags')
-    assert response.status_code == 404
+    assert response.status_code == 200
     assert json_of_response(response) == {
-            'Status': 404, 'error': 'no red flags'
+            'Status': 200, 'data': []
             }
 
 
@@ -97,9 +97,8 @@ def test_get_single_flag_by_id(client):
 # Test correct response if particular flag non available
 def test_get_single_flag_by_non_existent_id_fails(client):
     resp = client.get('/api/v1/red_flags/100')
-    assert resp.status_code == 404
-    assert 'error' in json_of_response(resp)
-    assert json_of_response(resp)['error'] == 'red flag not found'
+    assert resp.status_code == 200
+    assert json_of_response(resp)['data'] == []
 
 
 # Test can edit comment
@@ -141,7 +140,7 @@ def test_add_goeloc(client):
 
 
 # Test correct response if flag to be edited does not exist
-def test_correct_response_if_flag_tobe_edited_not_exist(client):
+def test_correct_response_if_flag_to_be_edited_not_exist(client):
     response = patch_json(
             client, '/api/v1/red_flags/1/comment', {'comment': 'any'}
             )
@@ -289,3 +288,14 @@ def test_correct_response_wrong_method_for_update(client):
             client, '/api/v1/red_flags/1/comment', {'comment': 'any'}
             )
     assert json_of_response(response)['error'] == 'wrong method'
+
+
+def test_validate_duplicate(client):
+    post_json(client, '/api/v1/red_flags', dat['basic'])
+    res = post_json(client, '/api/v1/red_flags', dat['basic'])
+    assert json_of_response(res)['data'][0]['message'] == 'red flag exists'
+
+
+def test_validate_descriptive_fields_on_create(client):
+    res = post_json(client, '/api/v1/red_flags', dat['invalidComment'])
+    assert json_of_response(res)['error'] == 'comment must be descriptive'

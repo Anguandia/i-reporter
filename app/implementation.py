@@ -1,6 +1,5 @@
 from .models import RedFlag
 import datetime
-import re
 
 red_flags = {}
 
@@ -26,10 +25,7 @@ class Implementation:
             ]
 
     def get_flags(self):
-        if not red_flags.keys():
-            res = [404, 'error', 'no red flags']
-        else:
-            res = [200, 'data', [red_flags[key] for key in red_flags.keys()]]
+        res = [200, 'data', [red_flags[key] for key in red_flags.keys()]]
         return res
 
     def get_flag(self, red_flag_id):
@@ -38,50 +34,35 @@ class Implementation:
             res = [200, 'data', [red_flag]]
         except Exception as e:
             print(e)
-            res = [404, 'error', 'red flag not found']
+            res = [200, 'data', []]
         return res
 
     def edit(self, red_flag_id, data, field):
-        try:
-            red_flag = red_flags[str(red_flag_id)]
-            if red_flag['status'] in ['rejected', 'resolved']:
-                return [
-                    403, 'error', f'red flag already {red_flag["status"]}'
-                    ]
-            elif field == 'location' and ' ' in data['location']:
-                d = data['location'].split(' ')
-                # case first case geolocation being added, tag record as
-                # 'location added' with geolocation prepend and append geoloc
-                # to descriptive loc already in
-                if 'geolocation' not in red_flag['location']:
-                    red_flag['location'] += ' ' + 'geolocation ' +\
-                     f'N: {d[0]}, E: {d[1]}'
-                    res = 'added'
-                # case already taged, replace existing geolocation with new
-                else:
-                    red_flag['location'] =\
-                        red_flag['location'][:red_flag['location'].index(
-                            'geolocation')] +\
-                        'geolocation ' + f'N: {d[0]}, E: {d[1]}'
-                    res = 'updated'
-            # make a general provision for future editable fields
-            elif field == 'location' and ' ' not in data['location']:
-
-                res = [
-                    400, 'error',
-                    "location must be of format'latitude <space> longitude'"
-                    ]
-            else:
-                red_flag[field] = data[field]
-                res = 'updated'
-            if isinstance(res, str):
-                result = [200, 'data', [{
-                    'id': int(red_flag_id), 'message':
-                    f'{res} red-flag record\'s {field}'}]]
-            else:
-                result = res
-        except Exception:
-            result = self.get_flag(red_flag_id)
+        red_flag = self.get_flag(red_flag_id)[2]
+        if len(red_flag) == 0:
+            res = [400, 'error', 'red flag not found']
+        elif red_flag[0]['status'] in ['rejected', 'resolved']:
+            res = [
+                403, 'error', f'red flag already {red_flag[0]["status"]}'
+                ]
+        elif field == 'location' and 'geolocation' not in red_flag[0][
+                'location']:
+            red_flag[0]['location'] += ' ' + data['location']
+            res = 'added'
+        elif field == 'location' and 'geolocation' in red_flag[0]['location']:
+            red_flag[0]['location'] =\
+                    red_flag[0]['location'][:red_flag[0]['location'].index(
+                        'geolocation')] + data['location']
+            res = 'updated'
+        else:
+            red_flag[0][field] = data[field]
+            res = 'updated'
+        if isinstance(res, str):
+            result = [200, 'data', [{
+                'id': int(red_flag_id), 'message':
+                f'{res} red-flag record\'s {field}'}]]
+        else:
+            result = res
         return result
 
     def delete(self, red_flag_id):

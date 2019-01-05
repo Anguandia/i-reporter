@@ -28,6 +28,22 @@ class Validation:
             # elif field not in self.data_types:
             #    return [400, 'error', f'unknown input {field}']
 
+    def validateRoute(self, resource):
+        if resource != 'red_flags':
+            res = [400, 'error', f'wrong url, check \'{resource}\'']
+            return res
+
+    def validateDuplicate(self, data):
+        flags = Implementation().get_flags()[2]
+        for flag in flags:
+            if data['location'] in flag['location'] and data['comment']\
+                    == flag['comment']:
+                return [
+                    200, 'data', [
+                        {'id': flag['id'], 'message': 'red flag exists'}
+                        ]
+                    ]
+
     def validateNew(self, data):
         for field in ['location', 'comment', 'createdBy']:
             if field not in data:
@@ -37,8 +53,15 @@ class Validation:
                     ]
             elif not data[field]:
                 return [400, 'error', 'please submit {}'.format(field)]
+            elif field in ['location', 'comment'] and not self.validateInt(
+                    data[field]):
+                return [
+                    400, 'error', f'{field} must be descriptive'
+                    ]
         if self.bad_type(data):
             result = self.bad_type(data)
+        elif self.validateDuplicate(data):
+            result = self.validateDuplicate(data)
         else:
             result = Implementation().create(data)
         return result
@@ -55,14 +78,24 @@ class Validation:
         # safeguard against accidental deleting of field data
         elif not data[field]:
             result = [400, 'error', f'submit new {field}']
+        elif field == 'location' and ' ' in data['location']:
+            d = data['location'].split(' ')
+            result = Implementation().edit(red_flag_id, {
+                'location': 'geolocation ' + f'N: {d[0]}, E: {d[1]}'},
+                'location')
+        elif field == 'location' and ' ' not in data['location']:
+            result = [
+                400, 'error',
+                "location must be of format'latitude <space> longitude'"
+                ]
         else:
             result = Implementation().edit(red_flag_id, data, field)
         return result
 
     '''validation for id in url'''
     @staticmethod
-    def validateId(id):
+    def validateInt(data):
         try:
-            int(id)
+            int(data)
         except Exception:
             return 'id must be a number'

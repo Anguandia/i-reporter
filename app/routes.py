@@ -32,12 +32,11 @@ def home():
   methods=['GET', 'POST', 'PATCH', 'DELETE']
   )
 def wrongURL(resource, methods=['get'], id=None, action=None):
-    if resource != 'red_flags':
-        return jsonify(
-            {'Status': 400, 'error': f'wrong url, check \'{resource}\''}
-            ), 400
+    if Validation().validateRoute(resource):
+        res = Validation().validateRoute(resource)
     elif request.method not in methods:
-        return jsonify({'Status': 405, 'error': 'wrong method'}), 405
+        res = [405, 'error', 'wrong method']
+    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
 
 
 @app.route('/api/v1/red_flags', methods=['POST'])
@@ -57,8 +56,8 @@ def get_flags():
 @app.route('/api/v1/red_flags/<red_flag_id>', methods=[
     'get', 'delete'])
 def single_flag(red_flag_id):
-    if Validation.validateId(red_flag_id):
-        res = [400, 'error', Validation.validateId(red_flag_id)]
+    if Validation.validateInt(red_flag_id):
+        res = [400, 'error', Validation.validateInt(red_flag_id)]
     elif request.method == 'GET':
         res = Implementation().get_flag(red_flag_id)
     elif request.method == 'DELETE':
