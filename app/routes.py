@@ -36,21 +36,19 @@ def wrongURL(resource, methods=['get'], id=None, action=None):
         res = Validation().validateRoute(resource)
     elif request.method not in methods:
         res = [405, 'error', 'wrong method']
-    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
+    return result(res)
 
 
 @app.route('/api/v1/red_flags', methods=['POST'])
 @json_required
 def create_flag():
     data = request.json
-    res = Validation().validateNew(data)
-    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
+    return result(Validation().validateNew(data))
 
 
 @app.route('/api/v1/red_flags', methods=['get'])
 def get_flags():
-    res = Implementation().get_flags()
-    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
+    return result(Implementation().get_flags())
 
 
 @app.route('/api/v1/red_flags/<red_flag_id>', methods=[
@@ -62,7 +60,7 @@ def single_flag(red_flag_id):
         res = Implementation().get_flag(red_flag_id)
     elif request.method == 'DELETE':
         res = Implementation().delete(red_flag_id)
-    return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
+    return result(res)
 
 
 @app.route('/api/v1/red_flags/<red_flag_id>/<key>', methods=[
@@ -71,4 +69,8 @@ def single_flag(red_flag_id):
 def edit(red_flag_id, key):
     data = request.json
     res = Validation().validateEdit(data, red_flag_id, key)
+    return result(res)
+
+
+def result(res):
     return jsonify({'Status': res[0], res[1]: res[2]}), res[0]
